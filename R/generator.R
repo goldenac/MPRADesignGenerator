@@ -14,7 +14,7 @@
 #' @export
 generate = function(variant_input_path, tag_path, scrambled_path){
   # 1) LOAD FILTERED TAGS #############################################################################################
-  tags <- tidyverse::read_csv(tag_path, col_names=TRUE, col_types=cols("c"))
+  tags <- readr::read_csv(tag_path, col_names=TRUE, col_types=cols("c"))
   
   # 2) CHECK TAGS FOR DIGESTION SITES #################################################################################
   tag_check <- tags
@@ -29,7 +29,7 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   # this section should be tested before being used as our tag set had no digestion sites so no tags were removed
   
   # 2) CREATE SCRAMBLED SEQUENCES #####################################################################################
-  scrambled_vars <- tidyverse::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
+  scrambled_vars <- readr::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
   
   # separate tags to be used for scrambled sequences
   tag_number <- nrow(tags)
@@ -44,7 +44,7 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   revspacer <- "GGC"
   revprimer <- "AGATCGGAAGAGCGTCG"
   
-  scrambled_vars <- scrambled_vars %>% tidyverse::slice(rep(1:n(), each=25))
+  scrambled_vars <- scrambled_vars %>% dplyr::slice(rep(1:n(), each=25))
   
   # format scrambled_vars to match complete_output
   scrambled_vars$CHROM <- "0"
@@ -60,7 +60,7 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   scrambled_vars <- subset(scrambled_vars, select=-c(rs_number, seq145))
   
   # 2) READ IN VARIANT INPUT ##########################################################################################
-  all_variants <- tidyverse::read_csv(variant_input_path, col_names=TRUE, col_types=cols("c","d","c","c","c"))
+  all_variants <- readr::read_csv(variant_input_path, col_names=TRUE, col_types=cols("c","d","c","c","c"))
   
   # 3) GET SEQUENCES ##################################################################################################
   genome <- BSgenome.Hsapiens.UCSC.hg38
@@ -71,9 +71,9 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   seqs_w_digest$KpnI <- grepl("GGTACC", seqs_w_digest$REFseq)
   seqs_w_digest$XbaI <- grepl("TCTAGA", seqs_w_digest$REFseq)
   seqs_w_digest$SfiI <- grepl("GGCC.....GGCC", seqs_w_digest$REFseq)
-  seqs_w_digest <- tidyverse::filter(seqs_w_digest, KpnI=="TRUE"|XbaI=="TRUE"|SfiI=="TRUE")
+  seqs_w_digest <- dplyr::filter(seqs_w_digest, KpnI=="TRUE"|XbaI=="TRUE"|SfiI=="TRUE")
   seqs_w_digest <- subset(seqs_w_digest, select=c(ID, REFseq, KpnI, XbaI, SfiI))
-  tidyverse::write.csv(seqs_w_digest, "sequences_w_digestion_sites.csv", row.names=FALSE)
+  #write.csv(seqs_w_digest, "sequences_w_digestion_sites.csv", row.names=FALSE)
   
   # 4) DETECT AND REPAIR DIGESTION SITES ##############################################################################
   # By searching for & repairing sites here, we reduce the number of operations the program must perform,
@@ -87,8 +87,8 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   # SfiI (will only repair one site per sequence)
   sfii <- "GGCC.....GGCC"
   all_variants$sfii <- grepl(sfii, all_variants$REFseq)
-  variants_wo_sfii <- tidyverse::filter(all_variants, sfii=="FALSE")
-  variants_w_sfii <- tidyverse::filter(all_variants, sfii=="TRUE")
+  variants_wo_sfii <- dplyr::filter(all_variants, sfii=="FALSE")
+  variants_w_sfii <- dplyr::filter(all_variants, sfii=="TRUE")
   variants_w_sfii_fixed <- variants_w_sfii
   variants_w_sfii$coords <- str_locate(variants_w_sfii$REFseq, "GGCC.....GGCC")
   variants_w_sfii$coord1 <- variants_w_sfii$coords[,"start"]
@@ -98,9 +98,9 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   all_variants <- subset(all_variants, select=-sfii)
   
   # 5) SEPARATE SNPS, INSERTIONS, AND DELETIONS #######################################################################
-  insertions <- tidyverse::filter(all_variants, REF=="-")
-  deletions <- tidyverse::filter(all_variants, ALT=="-")
-  snps <- tidyverse::filter(all_variants, REF!="-" & ALT!="-")
+  insertions <- dplyr::filter(all_variants, REF=="-")
+  deletions <- dplyr::filter(all_variants, ALT=="-")
+  snps <- dplyr::filter(all_variants, REF!="-" & ALT!="-")
   
   # #) COMPARE WHAT WILL BE CHANGED TO WHAT SHOULD BE CHANGED #########################################################
   # a way of checking that the coordinates are correct
@@ -168,57 +168,57 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   # 12) BIND ALL DATA TOGETHER ########################################################################################
   fwd_deletions_ref <- subset(deletions, select=-ALTseq)
   fwd_deletions_ref$class <- "fwd_ref"
-  fwd_deletions_ref <- fwd_deletions_ref %>% tidyverse::rename(seq=REFseq)
+  fwd_deletions_ref <- fwd_deletions_ref %>% dplyr::rename(seq=REFseq)
   
   fwd_deletions_alt <- subset(deletions, select=-REFseq)
   fwd_deletions_alt$class <- "fwd_alt"
-  fwd_deletions_alt <- fwd_deletions_alt %>% tidyverse::rename(seq=ALTseq)
+  fwd_deletions_alt <- fwd_deletions_alt %>% dplyr::rename(seq=ALTseq)
   
   fwd_insertions_ref <- subset(insertions, select=-ALTseq)
   fwd_insertions_ref$class <- "fwd_ref"
-  fwd_insertions_ref <- fwd_insertions_ref %>% tidyverse::rename(seq=REFseq)
+  fwd_insertions_ref <- fwd_insertions_ref %>% dplyr::rename(seq=REFseq)
   
   fwd_insertions_alt <- subset(insertions, select=-REFseq)
   fwd_insertions_alt$class <- "fwd_alt"
-  fwd_insertions_alt <- fwd_insertions_alt %>% tidyverse::rename(seq=ALTseq)
+  fwd_insertions_alt <- fwd_insertions_alt %>% dplyr::rename(seq=ALTseq)
   
   fwd_snps_ref <- subset(snps, select=-ALTseq)
   fwd_snps_ref$class <- "fwd_ref"
-  fwd_snps_ref <- fwd_snps_ref %>% tidyverse::rename(seq=REFseq)
+  fwd_snps_ref <- fwd_snps_ref %>% dplyr::rename(seq=REFseq)
   
   fwd_snps_alt <- subset(snps, select=-REFseq)
   fwd_snps_alt$class <- "fwd_alt"
-  fwd_snps_alt <- fwd_snps_alt %>% tidyverse::rename(seq=ALTseq)
+  fwd_snps_alt <- fwd_snps_alt %>% dplyr::rename(seq=ALTseq)
   
   
   rev_deletions_ref <- subset(rev_deletions, select=-ALTseq)
   rev_deletions_ref$class <- "rev_ref"
-  rev_deletions_ref <- rev_deletions_ref %>% tidyverse::rename(seq=REFseq)
+  rev_deletions_ref <- rev_deletions_ref %>% dplyr::rename(seq=REFseq)
   
   rev_deletions_alt <- subset(rev_deletions, select=-REFseq)
   rev_deletions_alt$class <- "rev_alt"
-  rev_deletions_alt <- rev_deletions_alt %>% tidyverse::rename(seq=ALTseq)
+  rev_deletions_alt <- rev_deletions_alt %>% dplyr::rename(seq=ALTseq)
   
   rev_insertions_ref <- subset(rev_insertions, select=-ALTseq)
   rev_insertions_ref$class <- "rev_ref"
-  rev_insertions_ref <- rev_insertions_ref %>% tidyverse::rename(seq=REFseq)
+  rev_insertions_ref <- rev_insertions_ref %>% dplyr::rename(seq=REFseq)
   
   rev_insertions_alt <- subset(rev_insertions, select=-REFseq)
   rev_insertions_alt$class <- "rev_alt"
-  rev_insertions_alt <- rev_insertions_alt %>% tidyverse::rename(seq=ALTseq)
+  rev_insertions_alt <- rev_insertions_alt %>% dplyr::rename(seq=ALTseq)
   
   rev_snps_ref <- subset(rev_snps, select=-ALTseq)
   rev_snps_ref$class <- "rev_ref"
-  rev_snps_ref <- rev_snps_ref %>% tidyverse::rename(seq=REFseq)
+  rev_snps_ref <- rev_snps_ref %>% dplyr::rename(seq=REFseq)
   
   rev_snps_alt <- subset(rev_snps, select=-REFseq)
   rev_snps_alt$class <- "rev_alt"
-  rev_snps_alt <- rev_snps_alt %>% tidyverse::rename(seq=ALTseq)
+  rev_snps_alt <- rev_snps_alt %>% dplyr::rename(seq=ALTseq)
   
   complete_variants <- rbind(fwd_deletions_ref, fwd_deletions_alt, fwd_insertions_ref, fwd_insertions_alt, fwd_snps_ref, fwd_snps_alt, rev_deletions_ref, rev_deletions_alt, rev_insertions_ref, rev_insertions_alt, rev_snps_ref, rev_snps_alt)
   
   # 13) ASSEMBLE CONSTRUCTS ############################################################################################
-  complete_variants <- complete_variants %>% tidyverse::slice(rep(1:n(), each=25))
+  complete_variants <- complete_variants %>% dplyr::slice(rep(1:n(), each=25))
   
   fwdprimer <- "ACTGGCCGCTTCACTG"
   fwdspacer <- "TG"
@@ -239,7 +239,7 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   
   # 14) BIND SCRAMBLED WITH OTHER VARIANTS ############################################################################
   
-  complete_variants <- complete_variants %>% tidyverse::rename(tag=barcode)
+  complete_variants <- complete_variants %>% dplyr::rename(tag=barcode)
   final_output <- rbind(scrambled_vars, complete_variants)
   # write.csv(final_output, "FINAL_OUTPUT_13Jan2021.csv", row.names=FALSE)
   
@@ -253,7 +253,7 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   print(final_check)
 
   
-  tidyverse::write.csv(final_output, "OLIGO_LIBRARY.csv", row.names=FALSE)
+  write.csv(final_output, "OLIGO_LIBRARY.csv", row.names=FALSE)
   
   # # check if all tags are unique
   # test <- unique(final_output$tag)

@@ -120,7 +120,7 @@ checkDigest = function(df_to_test)
   df_to_test$enz1 <- grepl(ez1, df_to_test$short_seq)
   df_to_test$enz2 <- grepl(ez2, df_to_test$short_seq)
   df_to_test$enz3 <- grepl(ez3, df_to_test$short_seq)
-  passed_w_digestion <- tidyverse::filter(df_to_test, enz1=='TRUE' | enz2=='TRUE' | enz3=='TRUE')
+  passed_w_digestion <- dplyr::filter(df_to_test, enz1=='TRUE' | enz2=='TRUE' | enz3=='TRUE')
   return(passed_w_digestion)
 }
 

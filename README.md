@@ -1,6 +1,6 @@
 # MPRADesignGenerator
 
-To run, first install the package:
+To run, first install the package (must have devtools installed already):
 
 devtools::install_github("goldenac/MPRADesignGenerator")
 

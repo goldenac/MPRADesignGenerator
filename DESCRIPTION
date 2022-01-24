@@ -8,7 +8,6 @@ Description: Creates file containing all oligo constructs
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Depends: Biostrings,
+Depends: Bioconductor, 
 	BiocManager, 
-	BSgenome.Hsapiens.UCSC.hg38, 
 	tidyverse

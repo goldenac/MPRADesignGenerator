@@ -1,15 +1,19 @@
 # MPRADesignGenerator
 
-To run, first install the package (must have devtools installed already):
+```
+install.packages("devtools")
 
 devtools::install_github("goldenac/MPRADesignGenerator")
 
+BiocManager::install("Biostrings")
 
-Then load:
+BiocManager::install("BSgenome.HSapiens.UCSC.hg38")
 
-library(MPRADesignGenerator)
+library("MPRADesignTools")
 
+library("Biostrings")
 
-Then run the generate function:
+library("BSgenome.HSapiens.UCSC.hg38")
+```
 
 generate(variant_input_file, tag_input_file, scrambled_input_file)

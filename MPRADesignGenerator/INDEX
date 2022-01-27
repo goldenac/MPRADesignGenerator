@@ -1,0 +1,10 @@
+altDel                  CREATE ALTERNATIVE SEQUENCES FOR DELETIONS
+altIns                  CREATE ALTERNATIVE SEQUENCES FOR INSERTIONS
+altSnps                 CREATE ALTERNATIVE SEQUENCES FOR SNPS
+checkDigest             CHECK FOR ALL THREE DIGESTION SITES
+delBases                GET BASES TO BE DELETED
+fixSfiI                 FIX SfiI DIGESTION SITE
+generate                Generate Design File
+refIns                  SHORTEN REFERENCE SEQUENCES FOR INSERTIONS
+retrieveSeq             RETRIEVE SEQUENCES
+snpBases                GET BASE TO BE CHANGED

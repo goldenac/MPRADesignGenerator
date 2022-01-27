@@ -1,6 +1,4 @@
-# CUSTOM MPRA PROCESSOR #############################################################################################
-
-#source("processor_functions.R")
+# CUSTOM MPRA DESIGN GENERATOR #############################################################################################
 
 #####################################################################################################################
 
@@ -8,11 +6,13 @@
 #'
 #' To actually generate the file containing all oligos in the library, run this function.
 #'
-#'
-#' @param variant input path, tags path, scrambled variants path
+#' @param tags_per_variant number of oligos with unique tags created for each variant
+#' @param variant_input_path path to file with variant input (e.g. "Documents/input_files/variant_input.csv")
+#' @param tag_path path to file containing tags
+#' @param scrambled_path path to file containing scrambled sequences
 #' @return design file
 #' @export
-generate = function(variant_input_path, tag_path, scrambled_path){
+generate = function(tags_per_variant, variant_input_path, tag_path, scrambled_path){
   # 1) LOAD FILTERED TAGS #############################################################################################
   tags <- readr::read_csv(tag_path, col_names=TRUE, col_types=cols("c"))
   
@@ -29,35 +29,38 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   # this section should be tested before being used as our tag set had no digestion sites so no tags were removed
   
   # 2) CREATE SCRAMBLED SEQUENCES #####################################################################################
-  scrambled_vars <- readr::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
-  
-  # separate tags to be used for scrambled sequences
-  tag_number <- nrow(tags)
-  scrambled_tags_needed <- nrow(scrambled_vars)*25
-  scrambled_tags <- tags[1:scrambled_tags_needed,]
-  tags <- tags[8601:tag_number,]
-  
-  fwdprimer <- "ACTGGCCGCTTCACTG"
-  fwdspacer <- "TG"
-  enzyme1 <- "GGTACC"
-  enzyme2 <- "TCTAGA"
-  revspacer <- "GGC"
-  revprimer <- "AGATCGGAAGAGCGTCG"
-  
-  scrambled_vars <- scrambled_vars %>% dplyr::slice(rep(1:n(), each=25))
-  
-  # format scrambled_vars to match complete_output
-  scrambled_vars$CHROM <- "0"
-  scrambled_vars$POS <- "0"
-  scrambled_vars$ID <- scrambled_vars$rs_number
-  scrambled_vars$REF <- "ref"
-  scrambled_vars$ALT <- "alt"
-  scrambled_vars$seq <- scrambled_vars$seq145
-  scrambled_vars$class <- "scrambled"
-  scrambled_vars$tag <- scrambled_tags$barcode
-  scrambled_vars$construct <- paste0(fwdprimer, fwdspacer, scrambled_vars$seq145, enzyme1, enzyme2, scrambled_tags$barcode, revspacer, revprimer)
-  
-  scrambled_vars <- subset(scrambled_vars, select=-c(rs_number, seq145))
+  if(!missing(scrambled_path))
+  {
+    scrambled_vars <- readr::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
+    
+    # separate tags to be used for scrambled sequences
+    tag_number <- nrow(tags)
+    scrambled_tags_needed <- nrow(scrambled_vars)*25
+    scrambled_tags <- tags[1:scrambled_tags_needed,]
+    tags <- tags[8601:tag_number,]
+    
+    fwdprimer <- "ACTGGCCGCTTCACTG"
+    fwdspacer <- "TG"
+    enzyme1 <- "GGTACC"
+    enzyme2 <- "TCTAGA"
+    revspacer <- "GGC"
+    revprimer <- "AGATCGGAAGAGCGTCG"
+    
+    scrambled_vars <- scrambled_vars %>% dplyr::slice(rep(1:n(), each=tags_per_variant))
+    
+    # format scrambled_vars to match complete_output
+    scrambled_vars$CHROM <- "0"
+    scrambled_vars$POS <- "0"
+    scrambled_vars$ID <- scrambled_vars$rs_number
+    scrambled_vars$REF <- "ref"
+    scrambled_vars$ALT <- "alt"
+    scrambled_vars$seq <- scrambled_vars$seq145
+    scrambled_vars$class <- "scrambled"
+    scrambled_vars$tag <- scrambled_tags$barcode
+    scrambled_vars$construct <- paste0(fwdprimer, fwdspacer, scrambled_vars$seq145, enzyme1, enzyme2, scrambled_tags$barcode, revspacer, revprimer)
+    
+    scrambled_vars <- subset(scrambled_vars, select=-c(rs_number, seq145))
+  }
   
   # 2) READ IN VARIANT INPUT ##########################################################################################
   all_variants <- readr::read_csv(variant_input_path, col_names=TRUE, col_types=cols("c","d","c","c","c"))
@@ -218,7 +221,7 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   complete_variants <- rbind(fwd_deletions_ref, fwd_deletions_alt, fwd_insertions_ref, fwd_insertions_alt, fwd_snps_ref, fwd_snps_alt, rev_deletions_ref, rev_deletions_alt, rev_insertions_ref, rev_insertions_alt, rev_snps_ref, rev_snps_alt)
   
   # 13) ASSEMBLE CONSTRUCTS ############################################################################################
-  complete_variants <- complete_variants %>% dplyr::slice(rep(1:n(), each=25))
+  complete_variants <- complete_variants %>% dplyr::slice(rep(1:n(), each=tags_per_variant))
   
   fwdprimer <- "ACTGGCCGCTTCACTG"
   fwdspacer <- "TG"
@@ -240,7 +243,14 @@ generate = function(variant_input_path, tag_path, scrambled_path){
   # 14) BIND SCRAMBLED WITH OTHER VARIANTS ############################################################################
   
   complete_variants <- complete_variants %>% dplyr::rename(tag=barcode)
-  final_output <- rbind(scrambled_vars, complete_variants)
+  if(missing(scrambled_path))
+  {
+    final_output <- complete_variants
+  }
+  else
+  {
+    final_output <- rbind(scrambled_vars, complete_variants)
+  }
   # write.csv(final_output, "FINAL_OUTPUT_13Jan2021.csv", row.names=FALSE)
   
   # 15) FINAL CHECK FOR DIGESTION SITES (INCLUDING JUNCTIONS) #########################################################

@@ -1,0 +1,26 @@
+Package: MPRADesignGenerator
+Title: Generate oligo library file for MPRA.
+Version: 0.0.0.9000
+Authors@R: 
+    person("Alyxandra", "Golden", , "Alyxandra.Golden@nih.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Creates file containing all oligo constructs
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Depends: BiocManager, tidyverse
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: MPRADesignGenerator
+RemoteUsername: goldenac
+RemoteRef: HEAD
+RemoteSha: 33ecee78a0f7669b0b12b8971a4c8c059440e42d
+GithubRepo: MPRADesignGenerator
+GithubUsername: goldenac
+GithubRef: HEAD
+GithubSHA1: 33ecee78a0f7669b0b12b8971a4c8c059440e42d
+NeedsCompilation: no
+Packaged: 2022-01-26 22:02:50 UTC; goldenac
+Author: Alyxandra Golden [aut, cre] (YOUR-ORCID-ID)
+Maintainer: Alyxandra Golden <Alyxandra.Golden@nih.gov>
+Built: R 4.0.2; ; 2022-01-26 22:02:50 UTC; windows

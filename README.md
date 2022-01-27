@@ -1,5 +1,6 @@
 # MPRADesignGenerator
 
+
 ## Installation ##
 
 Use devtools to install MPRADesignGenerator. 
@@ -19,14 +20,18 @@ library("BSgenome.Hsapiens.UCSC.hg38")
 ```
 
 ## Generating Your File ##
-generate(variant_input_file, tag_input_file, scrambled_input_file)
 
-Test MPRA
+- Required files and format
+- Using the generate function: generate(variant_input_file, tag_input_file, scrambled_input_file)
+- Test: Provide test files, command to run test files, and explain what should be output
+
 
 ## About MPRADesignGenerator ##
 
 - Purpose
+- What is output
 - How it works
+
 
 ## Troubleshooting ##
 

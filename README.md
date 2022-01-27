@@ -31,6 +31,8 @@ library("BSgenome.Hsapiens.UCSC.hg38")
 - Purpose
 - What is output
 - How it works
+    * How are alt sequences created for each variant type
+    * How are restriction enzyme sites handled
 
 
 ## Troubleshooting ##

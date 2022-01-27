@@ -1,15 +1,41 @@
 # MPRADesignGenerator
 
-To run, first install the package (must have devtools installed already):
 
+## Installation ##
+
+Use devtools to install MPRADesignGenerator. 
+```
+install.packages("devtools")
 devtools::install_github("goldenac/MPRADesignGenerator")
 
+library("MPRADesignTools")
+```
+MPRADesignGenerator relies on the **Biostrings** and **BSgenome.Hsapiens.UCSC.hg38** packages from Bioconductor. Install these packages using the following commands.
+```
+BiocManager::install("Biostrings")
+BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")
 
-Then load:
+library("Biostrings")
+library("BSgenome.Hsapiens.UCSC.hg38")
+```
 
-library(MPRADesignGenerator)
+## Generating Your File ##
+
+- Required files and format
+- Using the generate function: generate(variant_input_file, tag_input_file, scrambled_input_file)
+- Test: Provide test files, command to run test files, and explain what should be output
 
 
-Then run the generate function:
+## About MPRADesignGenerator ##
 
-generate(variant_input_file, tag_input_file, scrambled_input_file)
+- Purpose
+- What is output
+- How it works
+    * How are alt sequences created for each variant type
+    * How are restriction enzyme sites handled
+
+
+## Troubleshooting ##
+
+- Problems loading packages
+- File does not exist

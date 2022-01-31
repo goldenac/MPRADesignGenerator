@@ -34,6 +34,44 @@ fixSfiI = function(sequence, coord1, coord2)
   return(sequence)
 }
 
+##########################
+check_diff <- function(x,y)
+{
+  difference_vector <- c()
+  f <- 1
+  while(f<=nchar(x))
+  {
+    if(substr(x,f,f)!=substr(y,f,f))
+    {
+      difference_vector <- append(difference_vector, f)
+    }
+    f <- f + 1
+  }
+  return(difference_vector)
+}
+##########################
+
+#' FIX WildType DIGESTION SITE
+#'
+#' Changes SfiI site (GGCCNNNNNGGCC -> GCGCNNNNNGGCC)
+#' Will only first first digestion site in sequence.
+#'
+#'
+#' @param 145bp sequence containing site, coordinate of first base of
+#' restriction site, coordinate of second base of restriction site.
+#' @return corrected sequence
+#' @export
+fixDigWild <- function(enzx, enzFIX, sequence, coord1)
+{
+  diff_array <- check_diff(enzx, enzFIX)
+  for(k in diff_array)
+  {
+    fix_coord <- coord1 + k - 1
+    substr(sequence, fix_coord, fix_coord) <- substr(enzFIX, k, k)
+  }
+  return(sequence)
+}
+
 #' CREATE ALTERNATIVE SEQUENCES FOR DELETIONS
 #'
 #' Delete specified number of bases from ref seq. (Counts the number of bases
@@ -66,7 +104,7 @@ altIns = function(reference_sequence, insertion_bases)
   part_two <- substr(reference_sequence, 74, 145)
   alt_sequence <- paste0(part_one, insertion_bases, part_two)
   # shorten sequences to 145 bases or less
-  to_remove <- ceiling((nchar(alt_sequence)-145)/2) 
+  to_remove <- ceiling((nchar(alt_sequence)-145)/2)
   alt_sequence <- substr(alt_sequence, to_remove+1, nchar(alt_sequence)-to_remove)
   return(alt_sequence)
 }
@@ -109,7 +147,7 @@ altSnps = function(reference_sequence, new_base)
 #' (column with sequences tested should be named short_seq)
 #'
 #'
-#' @param dataframe with sequences to test 
+#' @param dataframe with sequences to test
 #' @return new dataframe containing sequences which had a digestion site
 #' @export
 checkDigest = function(df_to_test)
@@ -131,7 +169,7 @@ checkDigest = function(df_to_test)
 #' the bases that should be deleted per variant input file.
 #'
 #'
-#' @param reference sequence, string containing bases to delete 
+#' @param reference sequence, string containing bases to delete
 #' @return string containing bases that the program will delete.
 #' @export
 delBases = function(reference_sequence, deletion_bases)
@@ -147,7 +185,7 @@ delBases = function(reference_sequence, deletion_bases)
 #' the bases that should be changed per variant input file.
 #'
 #'
-#' @param reference sequence 
+#' @param reference sequence
 #' @return string containing base that the program will change.
 #' @export
 snpBases = function(reference_sequence)

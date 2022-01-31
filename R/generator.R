@@ -7,20 +7,26 @@
 #' To actually generate the file containing all oligos in the library, run this function.
 #'
 #' @param tags_per_variant number of oligos with unique tags created for each variant
+#' @param enz1 first digestion site
+#' @param enz2 second digestion site
+#' @param enz3 third digestion site
+#' @param enz1FIX how the first digestion site should be changed if found in genomic region (use . to represent any base)
+#' @param enz2FIX how the second digestion site should be changed if found in genomic region (use . to represent any base)
+#' @param enz3FIX how the third digestion site should be changed if found in genomic region (use . to represent any base)
 #' @param variant_input_path path to file with variant input (e.g. "Documents/input_files/variant_input.csv")
 #' @param tag_path path to file containing tags
 #' @param scrambled_path path to file containing scrambled sequences
 #' @return design file
 #' @export
-generate = function(tags_per_variant, variant_input_path, tag_path, scrambled_path){
+generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FIX, variant_input_path, tag_path, scrambled_path){
   # 1) LOAD FILTERED TAGS #############################################################################################
   tags <- readr::read_csv(tag_path, col_names=TRUE, col_types=cols("c"))
   
   # 2) CHECK TAGS FOR DIGESTION SITES #################################################################################
   tag_check <- tags
-  tag_check$ez1 <- grepl("GGTACC", tag_check$barcode)
-  tag_check$ez2 <- grepl("TCTAGA", tag_check$barcode)
-  tag_check$ez3 <- grepl("GGCC.....GGCC", tag_check$barcode)
+  tag_check$ez1 <- grepl(enz1, tag_check$barcode)
+  tag_check$ez2 <- grepl(enz2, tag_check$barcode)
+  tag_check$ez3 <- grepl(enz3, tag_check$barcode)
   bad_tag_rows <- which(tag_check$ez1==TRUE|tag_check$ez2==TRUE|tag_check$ez3==TRUE)
   if(length(bad_tag_rows)!=0)
   {
@@ -41,8 +47,8 @@ generate = function(tags_per_variant, variant_input_path, tag_path, scrambled_pa
     
     fwdprimer <- "ACTGGCCGCTTCACTG"
     fwdspacer <- "TG"
-    enzyme1 <- "GGTACC"
-    enzyme2 <- "TCTAGA"
+    enzyme1 <- enz1
+    enzyme2 <- enz2
     revspacer <- "GGC"
     revprimer <- "AGATCGGAAGAGCGTCG"
     
@@ -71,12 +77,14 @@ generate = function(tags_per_variant, variant_input_path, tag_path, scrambled_pa
   
   # 3.5) GENERATE A LIST OF SEQUENCES THAT HAVE DIGESTION SITES #######################################################
   seqs_w_digest <- all_variants
-  seqs_w_digest$KpnI <- grepl("GGTACC", seqs_w_digest$REFseq)
-  seqs_w_digest$XbaI <- grepl("TCTAGA", seqs_w_digest$REFseq)
-  seqs_w_digest$SfiI <- grepl("GGCC.....GGCC", seqs_w_digest$REFseq)
-  seqs_w_digest <- dplyr::filter(seqs_w_digest, KpnI=="TRUE"|XbaI=="TRUE"|SfiI=="TRUE")
-  seqs_w_digest <- subset(seqs_w_digest, select=c(ID, REFseq, KpnI, XbaI, SfiI))
+  seqs_w_digest$Enz1 <- grepl(enz1, seqs_w_digest$REFseq)
+  seqs_w_digest$Enz2 <- grepl(enz2, seqs_w_digest$REFseq)
+  seqs_w_digest$Enz3 <- grepl(enz3, seqs_w_digest$REFseq)
+  seqs_w_digest <- dplyr::filter(seqs_w_digest, Enz1=="TRUE"|Enz2=="TRUE"|Enz3=="TRUE")
+  seqs_w_digest <- subset(seqs_w_digest, select=c(ID, REFseq, Enz1, Enz2, Enz3))
   #write.csv(seqs_w_digest, "sequences_w_digestion_sites.csv", row.names=FALSE)
+  
+  # need a function to check that digestion site isn't around SNP
   
   # 4) DETECT AND REPAIR DIGESTION SITES ##############################################################################
   # By searching for & repairing sites here, we reduce the number of operations the program must perform,
@@ -84,21 +92,24 @@ generate = function(tags_per_variant, variant_input_path, tag_path, scrambled_pa
   # This is currently acceptable since we have already removed those variants with this problem, but in the future
   # this check should be done for both ref and alt sequences (if only 1 has site, alt causes prob), not just ref.
   
-  all_variants$REFseq <- gsub("GGTACC", "GGATCC", all_variants$REFseq)
-  all_variants$REFseq <- gsub("TCTAGA", "TCATGA", all_variants$REFseq)
   
-  # SfiI (will only repair one site per sequence)
-  sfii <- "GGCC.....GGCC"
-  all_variants$sfii <- grepl(sfii, all_variants$REFseq)
-  variants_wo_sfii <- dplyr::filter(all_variants, sfii=="FALSE")
-  variants_w_sfii <- dplyr::filter(all_variants, sfii=="TRUE")
-  variants_w_sfii_fixed <- variants_w_sfii
-  variants_w_sfii$coords <- str_locate(variants_w_sfii$REFseq, "GGCC.....GGCC")
-  variants_w_sfii$coord1 <- variants_w_sfii$coords[,"start"]
-  variants_w_sfii$coord2 <- variants_w_sfii$coords[,"end"]
-  variants_w_sfii_fixed$REFseq <- fixSfiI(variants_w_sfii$REFseq, variants_w_sfii$coord1, variants_w_sfii$coord2)
-  all_variants <- rbind(variants_wo_sfii, variants_w_sfii_fixed)
-  all_variants <- subset(all_variants, select=-sfii)
+  # Assuming enzyme1 and enzyme2 do not include special characters
+  all_variants$REFseq <- gsub(enz1, enz1FIX, all_variants$REFseq)
+  all_variants$REFseq <- gsub(enz2, enz2FIX, all_variants$REFseq)
+  
+  # Assuming enzyme3 may or may not contain special characters (will only repair one site per sequence)
+  all_variants$enz3 <- grepl(enz3, all_variants$REFseq)
+  variants_wo_enz3 <- dplyr::filter(all_variants, enz3=="FALSE")
+  variants_w_enz3 <- dplyr::filter(all_variants, sfii=="TRUE")
+  variants_w_enz3_fixed <- variants_w_enz3
+  variants_w_enz3$coords <- str_locate(variants_w_enz3$REFseq, enz3)
+  variants_w_enz3$coord1 <- variants_w_enz3$coords[,"start"]
+  variants_w_enz3$coord2 <- variants_w_enz3$coords[,"end"]
+  variants_w_enz3_fixed$REFseq <- fixDigWild(enz3, enz3FIX, variants_w_enz3$REFseq, variants_w_enz3$coord1)
+  all_variants <- rbind(variants_wo_enz3, variants_w_enz3_fixed)
+  all_variants <- subset(all_variants, select=-enz3)
+  
+  # Final check that all digestion sites have been repaired
   
   # 5) SEPARATE SNPS, INSERTIONS, AND DELETIONS #######################################################################
   insertions <- dplyr::filter(all_variants, REF=="-")

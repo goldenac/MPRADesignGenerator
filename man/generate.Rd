@@ -4,10 +4,16 @@
 \alias{generate}
 \title{Generate Design File}
 \usage{
-generate(variant_input_path, tag_path, scrambled_path)
+generate(tags_per_variant, variant_input_path, tag_path, scrambled_path)
 }
 \arguments{
-\item{variant}{input path, tags path, scrambled variants path}
+\item{tags_per_variant}{number of oligos with unique tags created for each variant}
+
+\item{variant_input_path}{path to file with variant input (e.g. "Documents/input_files/variant_input.csv")}
+
+\item{tag_path}{path to file containing tags}
+
+\item{scrambled_path}{path to file containing scrambled sequences}
 }
 \value{
 design file

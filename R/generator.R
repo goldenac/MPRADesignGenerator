@@ -41,9 +41,10 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
     # separate tags to be used for scrambled sequences
     tag_number <- nrow(tags)
-    scrambled_tags_needed <- nrow(scrambled_vars)*25
+    scrambled_tags_needed <- nrow(scrambled_vars)*tags_per_variant
     scrambled_tags <- tags[1:scrambled_tags_needed,]
-    tags <- tags[8601:tag_number,]
+    start_of_next_tags <- scrambled_tags_needed + 1
+    tags <- tags[start_of_next_tags:tag_number,]
 
     fwdprimer <- "ACTGGCCGCTTCACTG"
     fwdspacer <- "TG"
@@ -154,18 +155,23 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   ### remove unfixable variants from all variants
   cant_fix_variants <- rbind(cant_fix_e1, cant_fix_e2, cant_fix_e3)
-  #cant_fix_variants <- subset(cant_fix_variants, select=rsID)
-  #HOW??????
-  write.csv(cant_fix_variants, "cannot_be_fixed.csv")
 
+  if(nrow(cant_fix_variants)>0)
+  {
+    print("WARNING: Some variants have a digestion site around the SNP. No oligos will be generated for these variants.
+          You can see which variants have been excluded in the file titled 'cannot_be_fixed.csv.' ")
+    write.csv(cant_fix_variants, "cannot_be_fixed.csv", row.names=FALSE)
 
+    # remove variants with unfixable digestion sites from all_variants  !!!
+    rows_with_unfixables <- which(all_variants$ID == cant_fix_variants$ID)
+    all_variants <- all_variants[-rows_with_unfixables,]
+  } #does this work?
 
 
   # 4) DETECT AND REPAIR DIGESTION SITES ##############################################################################
-  # By searching for & repairing sites here, we reduce the number of operations the program must perform,
-  # but we also must assume that creating the alt sequence does not introduce new digestion sites.
-  # This is currently acceptable since we have already removed those variants with this problem, but in the future
-  # this check should be done for both ref and alt sequences (if only 1 has site, alt causes prob), not just ref.
+  # By searching for & repairing sites here, we reduce the number of operations the program must perform.
+  # This is acceptable because we have already confirmed that the variants in all_variants do not have digestion sites
+  # at the SNP.
 
 
   # Assuming enzyme1 and enzyme2 do not include special characters
@@ -382,4 +388,3 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   #
   # write.csv(shuffled_output, "OLIGO_LIBRARY_SHUFFLED.CSV", row.names=FALSE)
 }
-

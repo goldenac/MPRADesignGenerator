@@ -4,10 +4,33 @@
 \alias{generate}
 \title{Generate Design File}
 \usage{
-generate(tags_per_variant, variant_input_path, tag_path, scrambled_path)
+generate(
+  tags_per_variant,
+  enz1,
+  enz2,
+  enz3,
+  enz1FIX,
+  enz2FIX,
+  enz3FIX,
+  variant_input_path,
+  tag_path,
+  scrambled_path
+)
 }
 \arguments{
 \item{tags_per_variant}{number of oligos with unique tags created for each variant}
+
+\item{enz1}{first digestion site}
+
+\item{enz2}{second digestion site}
+
+\item{enz3}{third digestion site}
+
+\item{enz1FIX}{how the first digestion site should be changed if found in genomic region (use . to represent any base)}
+
+\item{enz2FIX}{how the second digestion site should be changed if found in genomic region (use . to represent any base)}
+
+\item{enz3FIX}{how the third digestion site should be changed if found in genomic region (use . to represent any base)}
 
 \item{variant_input_path}{path to file with variant input (e.g. "Documents/input_files/variant_input.csv")}
 

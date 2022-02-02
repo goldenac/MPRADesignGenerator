@@ -71,6 +71,29 @@ fixDigWild <- function(enzx, enzFIX, sequence, coord1)
   }
   return(sequence)
 }
+#############################
+
+are_repeat_sites_fixable <- function(enzx, seq)
+{
+  lengthofstring <- nchar(enzx)
+  fillerstring <- strrep("x", lengthofstring)
+  temp_seq <- seq
+  while(str_count(temp_seq, enzx)!=0)
+  {
+    coords <- str_locate(temp_seq, enzx)
+    c1 <- coords[,"start"]
+    c2 <- coords[,"end"]
+    if(is.na(c1)==FALSE)
+    {
+      if(c1<=73 & c2>=73)
+      {
+        return(FALSE)
+      }
+    }
+    substr(temp_seq, c1, c2) <- fillerstring
+  }
+  return(TRUE)
+}
 
 #' CREATE ALTERNATIVE SEQUENCES FOR DELETIONS
 #'

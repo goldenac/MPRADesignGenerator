@@ -84,7 +84,70 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   seqs_w_digest <- subset(seqs_w_digest, select=c(ID, REFseq, Enz1, Enz2, Enz3))
   #write.csv(seqs_w_digest, "sequences_w_digestion_sites.csv", row.names=FALSE)
 
-  # need a function to check that digestion site isn't around SNP
+  # need a function to check that digestion site isn't around SNP (calculate how far away first or last base of digestion site is from middle)
+  seqs_w_digest_coords_e1 <- dplyr::filter(seqs_w_digest, Enz1=="TRUE")
+  seqs_w_digest_coords_e2 <- dplyr::filter(seqs_w_digest, Enz2=="TRUE")
+  seqs_w_digest_coords_e3 <- dplyr::filter(seqs_w_digest, Enz3=="TRUE")
+
+  ### find e1 variants that are unfixable
+  seqs_w_digest_coords_e1$num_occurences <- stringr::str_count(seqs_w_digest_coords_e1$REFseq, enz1)
+  seq_w_multiple_e1 <- filter(seqs_w_digest_coords_e1, num_occurences>1)
+  seqs_w_digest_coords_e1 <- filter(seqs_w_digest_coords_e1, num_occurences==1)
+
+  seqs_w_digest_coords_e1$coords <- str_locate(seqs_w_digest_coords_e1$REFseq, enz1)
+  seqs_w_digest_coords_e1$c1 <- seqs_w_digest_coords_e1$coords[,"start"]
+  seqs_w_digest_coords_e1$c2 <- seqs_w_digest_coords_e1$coords[,"end"]
+
+  cant_fix_e1 <- filter(seqs_w_digest_coords_e1, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
+
+  seq_w_multiple_e1$fixable <- are_repeat_sites_fixable(enz1, seq_w_multiple_e1$REFseq) # adjust length here as well
+  multiple_unfixable_e1 <- filter(seq_w_multiple_e1, fixable=="FALSE")
+  multiple_fixable_e1 <- filter(seq_w_multiple_e1, fixable=="TRUE")
+
+  cant_fix_e1 <- rbind(cant_fix_e1, multiple_unfixable_e1)
+
+  ### find e2 variants that are unfixable
+  seqs_w_digest_coords_e2$num_occurences <- stringr::str_count(seqs_w_digest_coords_e2$REFseq, enz2)
+  seq_w_multiple_e2 <- filter(seqs_w_digest_coords_e2, num_occurences>1)
+  seqs_w_digest_coords_e2 <- filter(seqs_w_digest_coords_e2, num_occurences==1)
+
+  seqs_w_digest_coords_e2$coords <- str_locate(seqs_w_digest_coords_e2$REFseq, enz2)
+  seqs_w_digest_coords_e2$c1 <- seqs_w_digest_coords_e2$coords[,"start"]
+  seqs_w_digest_coords_e2$c2 <- seqs_w_digest_coords_e2$coords[,"end"]
+
+  cant_fix_e2 <- filter(seqs_w_digest_coords_e2, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
+
+  seq_w_multiple_e2$fixable <- are_repeat_sites_fixable(enz2, seq_w_multiple_e2$REFseq) # adjust length here as well
+  multiple_unfixable_e2 <- filter(seq_w_multiple_e2, fixable=="FALSE")
+  multiple_fixable_e2 <- filter(seq_w_multiple_e2, fixable=="TRUE")
+
+  cant_fix_e2 <- rbind(cant_fix_e2, multiple_unfixable_e2)
+
+  ### find e3 variants that are unfixable
+  seqs_w_digest_coords_e3$num_occurences <- stringr::str_count(seqs_w_digest_coords_e3$REFseq, enz3)
+  seq_w_multiple_e3 <- filter(seqs_w_digest_coords_e3, num_occurences>1)
+  seqs_w_digest_coords_e3 <- filter(seqs_w_digest_coords_e3, num_occurences==1)
+
+  seqs_w_digest_coords_e3$coords <- str_locate(seqs_w_digest_coords_e3$REFseq, enz3)
+  seqs_w_digest_coords_e3$c1 <- seqs_w_digest_coords_e3$coords[,"start"]
+  seqs_w_digest_coords_e3$c2 <- seqs_w_digest_coords_e3$coords[,"end"]
+
+  cant_fix_e3 <- filter(seqs_w_digest_coords_e3, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
+
+  seq_w_multiple_e3$fixable <- are_repeat_sites_fixable(enz3, seq_w_multiple_e3$REFseq) # adjust length here as well
+  multiple_unfixable_e3 <- filter(seq_w_multiple_e3, fixable=="FALSE")
+  multiple_fixable_e3 <- filter(seq_w_multiple_e3, fixable=="TRUE")
+
+  cant_fix_e3 <- rbind(cant_fix_e3, multiple_unfixable_e3)
+
+  ### remove unfixable variants from all variants
+  cant_fix_variants <- rbind(cant_fix_e1, cant_fix_e2, cant_fix_e3)
+  cant_fix_variants <- subset(cant_fix_variants, select=rsID)
+  #HOW??????
+  write.csv(cant_fix_variants, "cannot_be_fixed.csv")
+
+
+
 
   # 4) DETECT AND REPAIR DIGESTION SITES ##############################################################################
   # By searching for & repairing sites here, we reduce the number of operations the program must perform,
@@ -97,16 +160,26 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   all_variants$REFseq <- gsub(enz1, enz1FIX, all_variants$REFseq)
   all_variants$REFseq <- gsub(enz2, enz2FIX, all_variants$REFseq)
 
-  # Assuming enzyme3 may or may not contain special characters (will only repair one site per sequence)
+  # Assuming enzyme3 may or may not contain special characters (put in loop so all sites are repaired)
   all_variants$enz3 <- grepl(enz3, all_variants$REFseq)
   variants_wo_enz3 <- dplyr::filter(all_variants, enz3=="FALSE")
   variants_w_enz3 <- dplyr::filter(all_variants, enz3=="TRUE")
   variants_w_enz3_fixed <- variants_w_enz3
-  variants_w_enz3$coords <- str_locate(variants_w_enz3$REFseq, enz3)
-  variants_w_enz3$coord1 <- variants_w_enz3$coords[,"start"]
-  variants_w_enz3$coord2 <- variants_w_enz3$coords[,"end"]
-  variants_w_enz3_fixed$REFseq <- fixDigWild(enz3, enz3FIX, variants_w_enz3$REFseq, variants_w_enz3$coord1)
-  all_variants <- rbind(variants_wo_enz3, variants_w_enz3_fixed)
+
+  while("TRUE" %in% variants_w_enz3_fixed$enz3 == TRUE)
+  {
+    variants_w_enz3 <- dplyr::filter(variants_w_enz3_fixed, enz3=="TRUE")
+    variants_w_enz3_fixed <- variants_w_enz3
+    variants_w_enz3$coords <- stringr::str_locate(variants_w_enz3$REFseq, enz3)
+    variants_w_enz3$coord1 <- variants_w_enz3$coords[,"start"]
+    variants_w_enz3$coord2 <- variants_w_enz3$coords[,"end"]
+    variants_w_enz3_fixed$REFseq <- fixDigWild(enz3, enz3FIX, variants_w_enz3$REFseq, variants_w_enz3$coord1)
+    variants_w_enz3_fixed$enz3 <- grepl(enz3, variants_w_enz3_fixed$REFseq)
+    completely_fixed_transfer <- dplyr::filter(variants_w_enz3_fixed, enz3=="FALSE")
+    variants_wo_enz3 <- rbind(variants_wo_enz3, completely_fixed_transfer)
+  }
+
+  all_variants <- variants_wo_enz3
   all_variants <- subset(all_variants, select=-enz3)
 
   # Final check that all digestion sites have been repaired
@@ -236,8 +309,8 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   fwdprimer <- "ACTGGCCGCTTCACTG"
   fwdspacer <- "TG"
-  enzyme1 <- "GGTACC"
-  enzyme2 <- "TCTAGA"
+  enzyme1 <- enz1
+  enzyme2 <- enz2
   revspacer <- "GGC"
   revprimer <- "AGATCGGAAGAGCGTCG"
 
@@ -270,7 +343,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   final_check <- subset(final_output, select=c(ID, class, construct))
   final_check$short_seq <- gsub('.{39}$', '', final_check$construct) #remove last 39 bases
-  final_check <- checkDigest(final_check)
+  final_check <- checkDigest(final_check) #update to check for variable site
   print(final_check)
 
 

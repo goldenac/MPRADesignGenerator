@@ -103,7 +103,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   multiple_unfixable_e1 <- seq_w_multiple_e1
   if(nrow(seq_w_multiple_e1)>0)
   {
-    seq_w_multiple_e1$fixable <- are_repeat_sites_fixable(enz1, seq_w_multiple_e1$REFseq) # adjust length here as well
+    seq_w_multiple_e1$fixable <- sapply(seq_w_multiple_e1$REFseq, are_repeat_sites_fixable, enzx=enz1) # adjust length here as well
     multiple_unfixable_e1 <- filter(seq_w_multiple_e1, fixable=="FALSE")
     multiple_fixable_e1 <- filter(seq_w_multiple_e1, fixable=="TRUE")
   }
@@ -124,7 +124,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   multiple_unfixable_e2 <- seq_w_multiple_e2
   if(nrow(seq_w_multiple_e2)>0)
   {
-    seq_w_multiple_e2$fixable <- are_repeat_sites_fixable(enz2, seq_w_multiple_e2$REFseq) # adjust length here as well
+    seq_w_multiple_e2$fixable <- sapply(seq_w_multiple_e2$REFseq, are_repeat_sites_fixable, enzx=enz2) # adjust length here as well
     multiple_unfixable_e2 <- filter(seq_w_multiple_e2, fixable=="FALSE")
     multiple_fixable_e2 <- filter(seq_w_multiple_e2, fixable=="TRUE")
   }
@@ -145,7 +145,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   multiple_unfixable_e3 <- seq_w_multiple_e3
   if(nrow(seq_w_multiple_e3)>0)
   {
-    seq_w_multiple_e3$fixable <- are_repeat_sites_fixable(enz3, seq_w_multiple_e3$REFseq) # adjust length here as well
+    seq_w_multiple_e3$fixable <- sapply(seq_w_multiple_e3$REFseq, are_repeat_sites_fixable, enzx=enz3) # adjust length here as well
     multiple_unfixable_e3 <- filter(seq_w_multiple_e3, fixable=="FALSE")
     multiple_fixable_e3 <- filter(seq_w_multiple_e3, fixable=="TRUE")
   }
@@ -154,7 +154,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   ### remove unfixable variants from all variants
   cant_fix_variants <- rbind(cant_fix_e1, cant_fix_e2, cant_fix_e3)
-  cant_fix_variants <- subset(cant_fix_variants, select=rsID)
+  #cant_fix_variants <- subset(cant_fix_variants, select=rsID)
   #HOW??????
   write.csv(cant_fix_variants, "cannot_be_fixed.csv")
 

@@ -100,9 +100,12 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   cant_fix_e1 <- filter(seqs_w_digest_coords_e1, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
 
-  seq_w_multiple_e1$fixable <- are_repeat_sites_fixable(enz1, seq_w_multiple_e1$REFseq) # adjust length here as well
-  multiple_unfixable_e1 <- filter(seq_w_multiple_e1, fixable=="FALSE")
-  multiple_fixable_e1 <- filter(seq_w_multiple_e1, fixable=="TRUE")
+  if(nrow(seq_w_multiple_e1)>0)
+  {
+    seq_w_multiple_e1$fixable <- are_repeat_sites_fixable(enz1, seq_w_multiple_e1$REFseq) # adjust length here as well
+    multiple_unfixable_e1 <- filter(seq_w_multiple_e1, fixable=="FALSE")
+    multiple_fixable_e1 <- filter(seq_w_multiple_e1, fixable=="TRUE")
+  }
 
   cant_fix_e1 <- rbind(cant_fix_e1, multiple_unfixable_e1)
 
@@ -117,9 +120,12 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   cant_fix_e2 <- filter(seqs_w_digest_coords_e2, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
 
-  seq_w_multiple_e2$fixable <- are_repeat_sites_fixable(enz2, seq_w_multiple_e2$REFseq) # adjust length here as well
-  multiple_unfixable_e2 <- filter(seq_w_multiple_e2, fixable=="FALSE")
-  multiple_fixable_e2 <- filter(seq_w_multiple_e2, fixable=="TRUE")
+  if(nrow(seq_w_multiple_e2)>0)
+  {
+    seq_w_multiple_e2$fixable <- are_repeat_sites_fixable(enz2, seq_w_multiple_e2$REFseq) # adjust length here as well
+    multiple_unfixable_e2 <- filter(seq_w_multiple_e2, fixable=="FALSE")
+    multiple_fixable_e2 <- filter(seq_w_multiple_e2, fixable=="TRUE")
+  }
 
   cant_fix_e2 <- rbind(cant_fix_e2, multiple_unfixable_e2)
 
@@ -134,9 +140,12 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   cant_fix_e3 <- filter(seqs_w_digest_coords_e3, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
 
-  seq_w_multiple_e3$fixable <- are_repeat_sites_fixable(enz3, seq_w_multiple_e3$REFseq) # adjust length here as well
-  multiple_unfixable_e3 <- filter(seq_w_multiple_e3, fixable=="FALSE")
-  multiple_fixable_e3 <- filter(seq_w_multiple_e3, fixable=="TRUE")
+  if(nrow(seq_w_multiple_e3)>0)
+  {
+    seq_w_multiple_e3$fixable <- are_repeat_sites_fixable(enz3, seq_w_multiple_e3$REFseq) # adjust length here as well
+    multiple_unfixable_e3 <- filter(seq_w_multiple_e3, fixable=="FALSE")
+    multiple_fixable_e3 <- filter(seq_w_multiple_e3, fixable=="TRUE")
+  }
 
   cant_fix_e3 <- rbind(cant_fix_e3, multiple_unfixable_e3)
 

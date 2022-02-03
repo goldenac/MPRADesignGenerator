@@ -78,12 +78,13 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   # 3.5) GENERATE A LIST OF SEQUENCES THAT HAVE DIGESTION SITES #######################################################
   seqs_w_digest <- all_variants
+
   seqs_w_digest$Enz1 <- grepl(enz1, seqs_w_digest$REFseq)
   seqs_w_digest$Enz2 <- grepl(enz2, seqs_w_digest$REFseq)
   seqs_w_digest$Enz3 <- grepl(enz3, seqs_w_digest$REFseq)
   seqs_w_digest <- dplyr::filter(seqs_w_digest, Enz1=="TRUE"|Enz2=="TRUE"|Enz3=="TRUE")
   seqs_w_digest <- subset(seqs_w_digest, select=c(ID, REFseq, Enz1, Enz2, Enz3))
-  #write.csv(seqs_w_digest, "sequences_w_digestion_sites.csv", row.names=FALSE)
+  write.csv(seqs_w_digest, "sequences_w_digestion_sites.csv", row.names=FALSE)
 
   # need a function to check that digestion site isn't around SNP (calculate how far away first or last base of digestion site is from middle)
   seqs_w_digest_coords_e1 <- dplyr::filter(seqs_w_digest, Enz1=="TRUE")
@@ -100,12 +101,14 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   seqs_w_digest_coords_e1$c2 <- seqs_w_digest_coords_e1$coords[,"end"]
 
   cant_fix_e1 <- filter(seqs_w_digest_coords_e1, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
+  cant_fix_e1 <- subset(cant_fix_e1, select=-c(coords, c1, c2))
 
   multiple_unfixable_e1 <- seq_w_multiple_e1
   if(nrow(seq_w_multiple_e1)>0)
   {
     seq_w_multiple_e1$fixable <- sapply(seq_w_multiple_e1$REFseq, are_repeat_sites_fixable, enzx=enz1) # adjust length here as well
     multiple_unfixable_e1 <- filter(seq_w_multiple_e1, fixable=="FALSE")
+    multiple_unfixable_e1 <- subset(multiple_unfixable_e1, select=-fixable)
     multiple_fixable_e1 <- filter(seq_w_multiple_e1, fixable=="TRUE")
   }
 
@@ -121,12 +124,14 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   seqs_w_digest_coords_e2$c2 <- seqs_w_digest_coords_e2$coords[,"end"]
 
   cant_fix_e2 <- filter(seqs_w_digest_coords_e2, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
+  cant_fix_e2 <- subset(cant_fix_e2, select=-c(coords, c1, c2))
 
   multiple_unfixable_e2 <- seq_w_multiple_e2
   if(nrow(seq_w_multiple_e2)>0)
   {
     seq_w_multiple_e2$fixable <- sapply(seq_w_multiple_e2$REFseq, are_repeat_sites_fixable, enzx=enz2) # adjust length here as well
     multiple_unfixable_e2 <- filter(seq_w_multiple_e2, fixable=="FALSE")
+    multiple_unfixable_e2 <- subset(multiple_unfixable_e2, select=-fixable)
     multiple_fixable_e2 <- filter(seq_w_multiple_e2, fixable=="TRUE")
   }
 
@@ -142,12 +147,14 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   seqs_w_digest_coords_e3$c2 <- seqs_w_digest_coords_e3$coords[,"end"]
 
   cant_fix_e3 <- filter(seqs_w_digest_coords_e3, c1<=73 & c2>=73) # To make length adjustable, calculate middle base from user input and use here instead of 73
+  cant_fix_e3 <- subset(cant_fix_e3, select=-c(coords, c1, c2))
 
   multiple_unfixable_e3 <- seq_w_multiple_e3
   if(nrow(seq_w_multiple_e3)>0)
   {
     seq_w_multiple_e3$fixable <- sapply(seq_w_multiple_e3$REFseq, are_repeat_sites_fixable, enzx=enz3) # adjust length here as well
     multiple_unfixable_e3 <- filter(seq_w_multiple_e3, fixable=="FALSE")
+    multiple_unfixable_e3 <- subset(multiple_unfixable_e3, select=-fixable)
     multiple_fixable_e3 <- filter(seq_w_multiple_e3, fixable=="TRUE")
   }
 
@@ -158,14 +165,12 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   if(nrow(cant_fix_variants)>0)
   {
-    print("WARNING: Some variants have a digestion site around the SNP. No oligos will be generated for these variants.
-          You can see which variants have been excluded in the file titled 'cannot_be_fixed.csv.' ")
+    print("WARNING: Some variants have a digestion site around the SNP. No oligos will be generated for these variants. You can see which variants have been excluded in the file titled 'cannot_be_fixed.csv.' ")
     write.csv(cant_fix_variants, "cannot_be_fixed.csv", row.names=FALSE)
 
-    # remove variants with unfixable digestion sites from all_variants  !!!
-    rows_with_unfixables <- which(all_variants$ID == cant_fix_variants$ID)
+    rows_with_unfixables <- which(all_variants$ID %in% cant_fix_variants$ID)
     all_variants <- all_variants[-rows_with_unfixables,]
-  } #does this work?
+  }
 
 
   # 4) DETECT AND REPAIR DIGESTION SITES ##############################################################################

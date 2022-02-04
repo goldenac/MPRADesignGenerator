@@ -230,10 +230,8 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
   wrong_coords <- filter(deletion_coord_check, bases_match=="NO")
   if(nrow(wrong_coords)>0)
   {
-    del_err_msg <- "The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match. \n
-          This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'deletion_mismatch.csv' contains a list of the \n
-          variants where the bases marked for deletion do not match."
-    cat(del_err_msg)
+    del_err_msg <- "The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match.\nThis usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'deletion_mismatch.csv' contains a list of the\nvariants where the bases marked for deletion do not match."
+    writeLines(del_err_msg)
     write.csv(wrong_coords, "deletion_mismatch.csv")
   }
 
@@ -244,10 +242,8 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
   snp_wrong_coords <- filter(snp_coord_check, bases_match=="NO")
   if(nrow(snp_wrong_coords)>0)
   {
-    snp_err_msg <- "The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match. \n
-          This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1) or that REF and ALT bases are switched. \n
-          The file 'snp_mismatch.csv' contains a list of the variants where the bases marked for change do not match."
-    cat(snp_err_msg)
+    snp_err_msg <- "The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match.\nThis usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1) or that REF and ALT bases are switched.\nThe file 'snp_mismatch.csv' contains a list of the variants where the bases marked for change do not match."
+    writeLines(snp_err_msg)
     write.csv(snp_wrong_coords, "snp_mismatch.csv")
   }
 

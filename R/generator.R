@@ -6,6 +6,8 @@
 #'
 #' To actually generate the file containing all oligos in the library, run this function.
 #'
+#' @param fwdprimer forward primer
+#' @param revprimer reverse primer
 #' @param tags_per_variant number of oligos with unique tags created for each variant
 #' @param enz1 first digestion site
 #' @param enz2 second digestion site
@@ -231,7 +233,7 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
     del_err_msg <- "The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match. \n
           This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'deletion_mismatch.csv' contains a list of the \n
           variants where the bases marked for deletion do not match."
-    print(del_err_msg)
+    cat(del_err_msg)
     write.csv(wrong_coords, "deletion_mismatch.csv")
   }
 
@@ -245,7 +247,7 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
     snp_err_msg <- "The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match. \n
           This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1) or that REF and ALT bases are switched. \n
           The file 'snp_mismatch.csv' contains a list of the variants where the bases marked for change do not match."
-    print(snp_err_msg)
+    cat(snp_err_msg)
     write.csv(snp_wrong_coords, "snp_mismatch.csv")
   }
 

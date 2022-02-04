@@ -4,7 +4,7 @@
 \alias{checkDigest}
 \title{CHECK FOR ALL THREE DIGESTION SITES}
 \usage{
-checkDigest(df_to_test)
+checkDigest(df_to_test, ez1, ez2, ez3)
 }
 \arguments{
 \item{dataframe}{with sequences to test}

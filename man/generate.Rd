@@ -5,6 +5,8 @@
 \title{Generate Design File}
 \usage{
 generate(
+  fwdprimer,
+  revprimer,
   tags_per_variant,
   enz1,
   enz2,
@@ -18,6 +20,10 @@ generate(
 )
 }
 \arguments{
+\item{fwdprimer}{forward primer}
+
+\item{revprimer}{reverse primer}
+
 \item{tags_per_variant}{number of oligos with unique tags created for each variant}
 
 \item{enz1}{first digestion site}

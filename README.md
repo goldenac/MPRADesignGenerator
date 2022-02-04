@@ -3,11 +3,13 @@
 
 ## Installation ##
 
-Use devtools to install MPRADesignGenerator. 
+Use devtools to install MPRADesignGenerator. If you do not have devtools installed, use the following:
 ```
 install.packages("devtools")
+```
+Then install and load the package:
+```
 devtools::install_github("goldenac/MPRADesignGenerator")
-
 library("MPRADesignTools")
 ```
 MPRADesignGenerator relies on the **Biostrings** and **BSgenome.Hsapiens.UCSC.hg38** packages from Bioconductor. Install these packages using the following commands.

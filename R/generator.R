@@ -236,7 +236,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
 
   # check snps
   snp_coord_check <- snps
-  snp_coord_check$changed_bases <- snpBases(snp_coord_check$REFseq, snps$REF) # update this if updating length
+  snp_coord_check$changed_bases <- snpBases(snp_coord_check$REFseq) # update this if updating length
   snp_coord_check$bases_match <- ifelse(snp_coord_check$REF==snp_coord_check$changed_bases, "YES", "NO")
   snp_wrong_coords <- filter(snp_coord_check, bases_match=="NO")
   if(nrow(snp_wrong_coords)>0)

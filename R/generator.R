@@ -42,8 +42,10 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
     scrambled_vars <- readr::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
     if(nrow(tags) < nrow(scrambled_vars)*tags_per_variant)
     {
+      print("----------------")
       print("ERROR: The number of tags provided is not sufficient to create all oligos containing scrambled sequences. Provide more tags or change the number of tags used per variant.")
       print("Design File generation halted")
+      print("----------------")
       return(FALSE)
     }
     else
@@ -175,7 +177,9 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
 
   if(nrow(cant_fix_variants)>0)
   {
+    print("----------------")
     print("WARNING: Some variants have a digestion site around the SNP. No oligos will be generated for these variants. You can see which variants have been excluded in the file titled 'cannot_be_fixed.csv.' ")
+    print("----------------")
     write.csv(cant_fix_variants, "cannot_be_fixed.csv", row.names=FALSE)
 
     rows_with_unfixables <- which(all_variants$ID %in% cant_fix_variants$ID)
@@ -230,8 +234,12 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
   wrong_coords <- filter(deletion_coord_check, bases_match=="NO")
   if(nrow(wrong_coords)>0)
   {
-    del_err_msg <- "The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match.\nThis usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'deletion_mismatch.csv' contains a list of the\nvariants where the bases marked for deletion do not match."
-    writeLines(del_err_msg)
+    print("----------------")
+    print("WARNING:")
+    print(" -- The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match.")
+    print(" -- This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1).")
+    print(" -- The file 'deletion_mismatch.csv' contains a list of the variants where the bases marked for deletion do not match.")
+    print("----------------")
     write.csv(wrong_coords, "deletion_mismatch.csv")
   }
 
@@ -242,8 +250,12 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
   snp_wrong_coords <- filter(snp_coord_check, bases_match=="NO")
   if(nrow(snp_wrong_coords)>0)
   {
-    snp_err_msg <- "The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match.\nThis usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1) or that REF and ALT bases are switched.\nThe file 'snp_mismatch.csv' contains a list of the variants where the bases marked for change do not match."
-    writeLines(snp_err_msg)
+    print("----------------")
+    print("WARNING:")
+    print(" -- The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match.")
+    print(" -- This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1) or that REF and ALT bases are switched.")
+    print(" -- The file 'snp_mismatch.csv' contains a list of the variants where the bases marked for change do not match.")
+    print("----------------")
     write.csv(snp_wrong_coords, "snp_mismatch.csv")
   }
 
@@ -367,8 +379,10 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
   tags_needed = nrow(complete_variants)
   if(tags_needed>nrow(tags))
   {
+    print("----------------")
     print("ERROR: The number of tags needed to create all oligos exceeds the number of tags available. Provide more tags or change the number of tags used per variant.")
     print("Design File generation halted")
+    print("----------------")
     return(FALSE)
   }
 
@@ -399,10 +413,13 @@ generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, en
 
   if(nrow(final_check)>0)
   {
-    print("Some oligos have a digestion site where different components (primer, tag, etc.) are joined together. The file titled oligos_w_digestion_site.csv contains a complete list of such oligos.")
+    print("----------------")
+    print("WARNING: Some oligos have a digestion site where different components (primer, tag, etc.) are joined together. The file titled oligos_w_digestion_site.csv contains a complete list of such oligos.")
+    print("----------------")
     write.csv(final_check, "oligos_w_digestion_site.csv", row.names=FALSE)
   }
 
+  print("Library written to 'OLIGO_LIBRARY.CSV'")
   write.csv(final_output, "OLIGO_LIBRARY.csv", row.names=FALSE)
 
   # # check if all tags are unique

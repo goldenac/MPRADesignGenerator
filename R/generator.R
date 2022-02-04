@@ -18,7 +18,7 @@
 #' @param scrambled_path path to file containing scrambled sequences
 #' @return design file
 #' @export
-generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FIX, variant_input_path, tag_path, scrambled_path){
+generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FIX, variant_input_path, tag_path, scrambled_path){
   # 1) LOAD FILTERED TAGS #############################################################################################
   tags <- readr::read_csv(tag_path, col_names=TRUE, col_types=cols("c"))
 
@@ -53,12 +53,12 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
       start_of_next_tags <- scrambled_tags_needed + 1
       tags <- tags[start_of_next_tags:tag_number,]
 
-      fwdprimer <- "ACTGGCCGCTTCACTG"
+      #fwdprimer <- "ACTGGCCGCTTCACTG"
       fwdspacer <- "TG"
       enzyme1 <- enz1
       enzyme2 <- enz2
       revspacer <- "GGC"
-      revprimer <- "AGATCGGAAGAGCGTCG"
+      #revprimer <- "AGATCGGAAGAGCGTCG"
 
       scrambled_vars <- scrambled_vars %>% dplyr::slice(rep(1:n(), each=tags_per_variant))
 
@@ -228,9 +228,10 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   wrong_coords <- filter(deletion_coord_check, bases_match=="NO")
   if(nrow(wrong_coords)>0)
   {
-    print("The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match. \n
+    del_err_msg <- "The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match. \n
           This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'deletion_mismatch.csv' contains a list of the \n
-          variants where the bases marked for deletion do not match.")
+          variants where the bases marked for deletion do not match."
+    print(del_err_msg)
     write.csv(wrong_coords, "deletion_mismatch.csv")
   }
 
@@ -241,9 +242,10 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   snp_wrong_coords <- filter(snp_coord_check, bases_match=="NO")
   if(nrow(snp_wrong_coords)>0)
   {
-    print("The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match. \n
-          This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'snp_mismatch.csv' contains a list of the \n
-          variants where the bases marked for change do not match.")
+    snp_err_msg <- "The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match. \n
+          This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1) or that REF and ALT bases are switched. \n
+          The file 'snp_mismatch.csv' contains a list of the variants where the bases marked for change do not match."
+    print(snp_err_msg)
     write.csv(snp_wrong_coords, "snp_mismatch.csv")
   }
 
@@ -357,12 +359,12 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   # 13) ASSEMBLE CONSTRUCTS ############################################################################################
   complete_variants <- complete_variants %>% dplyr::slice(rep(1:n(), each=tags_per_variant))
 
-  fwdprimer <- "ACTGGCCGCTTCACTG"
+  #fwdprimer <- "ACTGGCCGCTTCACTG"
   fwdspacer <- "TG"
   enzyme1 <- enz1
   enzyme2 <- enz2
   revspacer <- "GGC"
-  revprimer <- "AGATCGGAAGAGCGTCG"
+  #revprimer <- "AGATCGGAAGAGCGTCG"
 
   tags_needed = nrow(complete_variants)
   if(tags_needed>nrow(tags))
@@ -394,13 +396,13 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   # This should be a very low number of sequences and as such can be fixed manually
 
   final_check <- subset(final_output, select=c(ID, class, construct))
-  final_check$short_seq <- gsub('.{39}$', '', final_check$construct) #remove last 39 bases
+  final_check$short_seq <- gsub('.{39}$', '', final_check$construct) #remove last 39 bases (ASSUMES REVPRIMER IS 17BP)
   final_check <- checkDigest(final_check, enz1, enz2, enz3) #update to check for variable site
 
   if(nrow(final_check)>0)
   {
     print("Some oligos have a digestion site where different components (primer, tag, etc.) are joined together. The file titled oligos_w_digestion_site.csv contains a complete list of such oligos.")
-    write.csv(final_check, "oliogs_w_digestion_site.csv", row.names=FALSE)
+    write.csv(final_check, "oligos_w_digestion_site.csv", row.names=FALSE)
   }
 
   write.csv(final_output, "OLIGO_LIBRARY.csv", row.names=FALSE)

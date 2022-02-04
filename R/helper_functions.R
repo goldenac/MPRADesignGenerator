@@ -173,11 +173,8 @@ altSnps = function(reference_sequence, new_base)
 #' @param dataframe with sequences to test
 #' @return new dataframe containing sequences which had a digestion site
 #' @export
-checkDigest = function(df_to_test)
+checkDigest = function(df_to_test, ez1, ez2, ez3)
 {
-  ez1 <- "GGTACC"
-  ez2 <- "TCTAGA"
-  ez3 <- "GGCC.....GGCC"
   df_to_test$enz1 <- grepl(ez1, df_to_test$short_seq)
   df_to_test$enz2 <- grepl(ez2, df_to_test$short_seq)
   df_to_test$enz3 <- grepl(ez3, df_to_test$short_seq)

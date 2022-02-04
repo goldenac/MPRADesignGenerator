@@ -38,35 +38,42 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   if(!missing(scrambled_path))
   {
     scrambled_vars <- readr::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
+    if(nrow(tags) < nrow(scrambled_vars)*tags_per_variant)
+    {
+      print("ERROR: The number of tags provided is not sufficient to create all oligos containing scrambled sequences. Provide more tags or change the number of tags per variant.")
+      return(FALSE)
+    }
+    else
+    {
+      # separate tags to be used for scrambled sequences
+      tag_number <- nrow(tags)
+      scrambled_tags_needed <- nrow(scrambled_vars)*tags_per_variant
+      scrambled_tags <- tags[1:scrambled_tags_needed,]
+      start_of_next_tags <- scrambled_tags_needed + 1
+      tags <- tags[start_of_next_tags:tag_number,]
 
-    # separate tags to be used for scrambled sequences
-    tag_number <- nrow(tags)
-    scrambled_tags_needed <- nrow(scrambled_vars)*tags_per_variant
-    scrambled_tags <- tags[1:scrambled_tags_needed,]
-    start_of_next_tags <- scrambled_tags_needed + 1
-    tags <- tags[start_of_next_tags:tag_number,]
+      fwdprimer <- "ACTGGCCGCTTCACTG"
+      fwdspacer <- "TG"
+      enzyme1 <- enz1
+      enzyme2 <- enz2
+      revspacer <- "GGC"
+      revprimer <- "AGATCGGAAGAGCGTCG"
 
-    fwdprimer <- "ACTGGCCGCTTCACTG"
-    fwdspacer <- "TG"
-    enzyme1 <- enz1
-    enzyme2 <- enz2
-    revspacer <- "GGC"
-    revprimer <- "AGATCGGAAGAGCGTCG"
+      scrambled_vars <- scrambled_vars %>% dplyr::slice(rep(1:n(), each=tags_per_variant))
 
-    scrambled_vars <- scrambled_vars %>% dplyr::slice(rep(1:n(), each=tags_per_variant))
+      # format scrambled_vars to match complete_output
+      scrambled_vars$CHROM <- "0"
+      scrambled_vars$POS <- "0"
+      scrambled_vars$ID <- scrambled_vars$rs_number
+      scrambled_vars$REF <- "ref"
+      scrambled_vars$ALT <- "alt"
+      scrambled_vars$seq <- scrambled_vars$seq145
+      scrambled_vars$class <- "scrambled"
+      scrambled_vars$tag <- scrambled_tags$barcode
+      scrambled_vars$construct <- paste0(fwdprimer, fwdspacer, scrambled_vars$seq145, enzyme1, enzyme2, scrambled_tags$barcode, revspacer, revprimer)
 
-    # format scrambled_vars to match complete_output
-    scrambled_vars$CHROM <- "0"
-    scrambled_vars$POS <- "0"
-    scrambled_vars$ID <- scrambled_vars$rs_number
-    scrambled_vars$REF <- "ref"
-    scrambled_vars$ALT <- "alt"
-    scrambled_vars$seq <- scrambled_vars$seq145
-    scrambled_vars$class <- "scrambled"
-    scrambled_vars$tag <- scrambled_tags$barcode
-    scrambled_vars$construct <- paste0(fwdprimer, fwdspacer, scrambled_vars$seq145, enzyme1, enzyme2, scrambled_tags$barcode, revspacer, revprimer)
-
-    scrambled_vars <- subset(scrambled_vars, select=-c(rs_number, seq145))
+      scrambled_vars <- subset(scrambled_vars, select=-c(rs_number, seq145))
+    }
   }
 
   # 2) READ IN VARIANT INPUT ##########################################################################################
@@ -205,8 +212,6 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   all_variants <- variants_wo_enz3
   all_variants <- subset(all_variants, select=-enz3)
 
-  # Final check that all digestion sites have been repaired
-
   # 5) SEPARATE SNPS, INSERTIONS, AND DELETIONS #######################################################################
   insertions <- dplyr::filter(all_variants, REF=="-")
   deletions <- dplyr::filter(all_variants, ALT=="-")
@@ -247,7 +252,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   rev_deletions$REFseq <- rev_deletions_ref_DNAset$REFseq
   rev_deletions$ALTseq <- rev_deletions_alt_DNAset$ALTseq
 
-  # 10) GENERATE REV COMP SEQ FOR INSERTIONS ###############################################################################
+  # 10) GENERATE REV COMP SEQ FOR INSERTIONS ###########################################################################
   rev_insertions <- insertions
 
   rev_insertions_ref_DNAset <- Biostrings::DNAStringSet(rev_insertions$REFseq)
@@ -261,7 +266,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   rev_insertions$REFseq <- rev_insertions_ref_DNAset$REFseq
   rev_insertions$ALTseq <- rev_insertions_alt_DNAset$ALTseq
 
-  # 11) GENERATE REV COMP SEQ FOR SNPS #####################################################################################
+  # 11) GENERATE REV COMP SEQ FOR SNPS ##################################################################################
   rev_snps <- snps
 
   rev_snps_ref_DNAset <- Biostrings::DNAStringSet(rev_snps$REFseq)
@@ -340,8 +345,10 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   tags_needed = nrow(complete_variants)
   if(tags_needed>nrow(tags))
   {
-    print("WARNING: The number of tags needed exceeds the number of tags available. Some oligos will not have tags")
+    print("ERROR: The number of tags needed exceeds the number of tags available. Provide more tags or change the number of tags used per variant.")
+    return(FALSE)
   }
+
   tags_to_use <- tags[1:tags_needed,]
   complete_variants <- cbind(complete_variants, tags_to_use)
 
@@ -358,17 +365,20 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   {
     final_output <- rbind(scrambled_vars, complete_variants)
   }
-  # write.csv(final_output, "FINAL_OUTPUT_13Jan2021.csv", row.names=FALSE)
 
   # 15) FINAL CHECK FOR DIGESTION SITES (INCLUDING JUNCTIONS) #########################################################
-  # will detect remaining digestion sites (e.g. there was more than 1 in a sequence) as well
+  # will detect remaining digestion sites (though there should be none) as well as at junctions where components of the construct meet.
   # This should be a very low number of sequences and as such can be fixed manually
 
   final_check <- subset(final_output, select=c(ID, class, construct))
   final_check$short_seq <- gsub('.{39}$', '', final_check$construct) #remove last 39 bases
-  final_check <- checkDigest(final_check) #update to check for variable site
-  print(final_check)
+  final_check <- checkDigest(final_check, enz1, enz2, enz3) #update to check for variable site
 
+  if(nrow(final_check)>0)
+  {
+    print("Some oligos have a digestion site where different components (primer, tag, etc.) are joined together. The file titled oligos_w_digestion_site.csv contains a complete list of such oligos.")
+    write.csv(final_check)
+  }
 
   write.csv(final_output, "OLIGO_LIBRARY.csv", row.names=FALSE)
 

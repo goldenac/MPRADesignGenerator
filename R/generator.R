@@ -40,7 +40,8 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
     scrambled_vars <- readr::read_csv(scrambled_path, col_names=TRUE, col_types=cols("c","c"))
     if(nrow(tags) < nrow(scrambled_vars)*tags_per_variant)
     {
-      print("ERROR: The number of tags provided is not sufficient to create all oligos containing scrambled sequences. Provide more tags or change the number of tags per variant.")
+      print("ERROR: The number of tags provided is not sufficient to create all oligos containing scrambled sequences. Provide more tags or change the number of tags used per variant.")
+      print("Design File generation halted")
       return(FALSE)
     }
     else
@@ -220,12 +221,33 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   # #) COMPARE WHAT WILL BE CHANGED TO WHAT SHOULD BE CHANGED #########################################################
   # a way of checking that the coordinates are correct
 
+  # check deletions
   deletion_coord_check <- deletions
-  deletion_coord_check$deleted_bases <- delBases(deletion_coord_check$REFseq, deletions$REF)
+  deletion_coord_check$deleted_bases <- delBases(deletion_coord_check$REFseq, deletions$REF) # update this if updating length
   deletion_coord_check$bases_match <- ifelse(deletion_coord_check$REF==deletion_coord_check$deleted_bases, "YES", "NO")
   wrong_coords <- filter(deletion_coord_check, bases_match=="NO")
-  print(wrong_coords)
-  # there are no deletions with the wrong coords!
+  if(nrow(wrong_coords)>0)
+  {
+    print("The bases that will be deleted by MPRADesignGenerator (REF) were compared to the bases you have indicated should be deleted. For some variants, these bases do not match. \n
+          This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'deletion_mismatch.csv' contains a list of the \n
+          variants where the bases marked for deletion do not match.")
+    write.csv(wrong_coords, "deletion_mismatch.csv")
+  }
+
+  # check snps
+  snp_coord_check <- snps
+  snp_coord_check$changed_bases <- snpBases(snp_coord_check$REFseq, snps$REF) # update this if updating length
+  snp_coord_check$bases_match <- ifelse(snp_coord_check$REF==snp_coord_check$changed_bases, "YES", "NO")
+  snp_wrong_coords <- filter(snp_coord_check, bases_match=="NO")
+  if(nrow(snp_wrong_coords)>0)
+  {
+    print("The base that will be changed by MPRADesignGenerator (REF) was compared to the base you have indicated should be changed. For some variants, these bases do not match. \n
+          This usually indicates that the coordinates you have provided are incorrect (often the POS coordinate is off by 1). The file 'snp_mismatch.csv' contains a list of the \n
+          variants where the bases marked for change do not match.")
+    write.csv(snp_wrong_coords, "snp_mismatch.csv")
+  }
+
+  # no good way to check for insertions at the moment
 
   # 6) CREATE ALT SEQ FOR DELETIONS ###################################################################################
   deletions$ALTseq <- altDel(deletions$REFseq, deletions$REF)
@@ -280,7 +302,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   rev_snps$REFseq <- rev_snps_ref_DNAset$REFseq
   rev_snps$ALTseq <- rev_snps_alt_DNAset$ALTseq
 
-  # 12) BIND ALL DATA TOGETHER ########################################################################################
+  # 12) BIND ALL DATA TOGETHER ###########################################################################################
   fwd_deletions_ref <- subset(deletions, select=-ALTseq)
   fwd_deletions_ref$class <- "fwd_ref"
   fwd_deletions_ref <- fwd_deletions_ref %>% dplyr::rename(seq=REFseq)
@@ -345,7 +367,8 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   tags_needed = nrow(complete_variants)
   if(tags_needed>nrow(tags))
   {
-    print("ERROR: The number of tags needed exceeds the number of tags available. Provide more tags or change the number of tags used per variant.")
+    print("ERROR: The number of tags needed to create all oligos exceeds the number of tags available. Provide more tags or change the number of tags used per variant.")
+    print("Design File generation halted")
     return(FALSE)
   }
 
@@ -377,7 +400,7 @@ generate = function(tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FI
   if(nrow(final_check)>0)
   {
     print("Some oligos have a digestion site where different components (primer, tag, etc.) are joined together. The file titled oligos_w_digestion_site.csv contains a complete list of such oligos.")
-    write.csv(final_check)
+    write.csv(final_check, "oliogs_w_digestion_site.csv", row.names=FALSE)
   }
 
   write.csv(final_output, "OLIGO_LIBRARY.csv", row.names=FALSE)

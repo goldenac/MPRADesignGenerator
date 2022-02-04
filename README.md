@@ -23,15 +23,15 @@ library("BSgenome.Hsapiens.UCSC.hg38")
 
 ## Generating Your File ##
 
-- Required files and format
 - Using the generate function: generate(variant_input_file, tag_input_file, scrambled_input_file)
+- Required files and format
+- Explain file
 - Test: Provide test files, command to run test files, and explain what should be output
 
 
 ## About MPRADesignGenerator ##
 
 - Purpose
-- What is output
 - How it works
     * How are alt sequences created for each variant type
     * How are restriction enzyme sites handled

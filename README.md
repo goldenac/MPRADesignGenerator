@@ -23,7 +23,7 @@ library("BSgenome.Hsapiens.UCSC.hg38")
 
 ## Generating Your File ##
 
-The .csv file containing the library of oligos is generated with the generate function. After installing the package, simply execute the generate function. For example:
+The .csv file containing the library of oligos is generated with the generate() function. After installing the package, simply execute the generate function. For example:
 ```
 generate(fwdprimer="ACGT",
          revprimer="GACT",
@@ -57,7 +57,12 @@ variant_input_path | Path to file containing variant coordinates and ref/alt all
 tag_path | Path to file containing tag sequences entered as a string. | "Documents/input_files/tags.csv"
 scrambled_path | Path to file containing scrambled sequences entered as a string. This argument is optional. | "Documents/input_files/scrambled_sequences.csv"
 
-- Required files and format
+- Input File Format
+    * MPRADesignGenerator makes use of three user-provided .csv files (two required, one optional). 
+    * 
+    * File 1: Variant Input (This file provides the rsID, coordinates (hg38), and ref/alt alleles for each variant)
+    * File 2: Tags
+    * File 3: Scrambled Sequences
 - Explain file
 - Test: Provide test files, command to run test files, and explain what should be output
 

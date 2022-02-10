@@ -61,6 +61,9 @@ scrambled_path | Path to file containing scrambled sequences entered as a string
     * MPRADesignGenerator makes use of three user-provided .csv files (two required, one optional). 
     * 
     * File 1: Variant Input (This file provides the rsID, coordinates (hg38), and ref/alt alleles for each variant)
+    
+    ![This is an image](./variant_input_format.png)
+    
     * File 2: Tags
     * File 3: Scrambled Sequences
 - Explain file

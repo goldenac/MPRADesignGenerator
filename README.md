@@ -62,7 +62,7 @@ scrambled_path | Path to file containing scrambled sequences entered as a string
     * 
     * File 1: Variant Input (This file provides the rsID, coordinates (hg38), and ref/alt alleles for each variant)
     
-    ![This is an image](./variant_input_format.png)
+    ![This is an image](./variant_input_format.PNG)
     
     * File 2: Tags
     * File 3: Scrambled Sequences

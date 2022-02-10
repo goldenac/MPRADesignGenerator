@@ -40,7 +40,7 @@ generate(fwdprimer="ACGT",
 )
 ```
 
-**Arguments to the *generate* function**
+**Arguments to the *generate()* function**
 
 Argument | Explanation | Example
 ---- | ---- | ----

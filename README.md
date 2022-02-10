@@ -57,22 +57,24 @@ variant_input_path | Path to file containing variant coordinates and ref/alt all
 tag_path | Path to file containing tag sequences entered as a string. | "Documents/input_files/tags.csv"
 scrambled_path | Path to file containing scrambled sequences entered as a string. This argument is optional. | "Documents/input_files/scrambled_sequences.csv"
 
-- Input File Format
-    * MPRADesignGenerator makes use of three user-provided .csv files (two required, one optional). **NOTE:** column headings cannot be changed.
-    * *File 1: Variant Input* - Provides the coordinates (hg38), rsID, and ref/alt alleles for each variant
-    
-    ![This is an image](./file_input_format/variant_input_format.PNG) 
-   
-    * *File 2: Tags* - Provides all tag sequences
-    
-    ![image](./file_input_format/tags_format.PNG)
-    
-    * *File 3: Scrambled Sequences* - Provides an ID and 145bp "scrambled" sequence. Note that these sequences do not necessarily have to be scrambled; any 145bp sequence can be provided.
-    
-    ![image](./file_input_format/scrambled_sequences_format.PNG)
+**Input File Format**
 
-- Explain file
-- Test: Provide test files, command to run test files, and explain what should be output
+MPRADesignGenerator makes use of three user-provided .csv files (two required, one optional). **NOTE:** column headings cannot be changed.
+
+- *File 1: Variant Input* - Provides the coordinates (hg38), rsID, and ref/alt alleles for each variant
+    
+![This is an image](./file_input_format/variant_input_format.PNG) 
+   
+- *File 2: Tags* - Provides all tag sequences
+    
+![image](./file_input_format/tags_format.PNG)
+    
+*File 3: Scrambled Sequences* - Provides an ID and 145bp "scrambled" sequence. Note that these sequences do not necessarily have to be scrambled; any 145bp sequence can be provided.
+    
+![image](./file_input_format/scrambled_sequences_format.PNG)
+
+
+### Output File ###
 
 
 ## About MPRADesignGenerator ##

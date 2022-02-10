@@ -25,8 +25,8 @@ library("BSgenome.Hsapiens.UCSC.hg38")
 
 The .csv file containing the library of oligos is generated with the generate() function. After installing the package, simply execute the generate function. For example:
 ```
-generate(fwdprimer="ACGT",
-         revprimer="GACT",
+generate(fwdprimer="GCTAATAAGCTTCACGT",
+         revprimer="GTTTAATCCGTACGCTCT",
          tags_per_variant=25,
          enz1="GGTACC",
          enz1FIX="GGATCC",

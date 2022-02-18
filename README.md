@@ -36,7 +36,7 @@ generate(fwdprimer="GCTAATAAGCTTCACGT",
          enz3FIX="GCGC.....GGCC",
          variant_input_path="Documents/input_files/variant_input.csv",
          tag_path="Documents/input_files/tags.csv",
-         discrete_path="Documents/input_files/scrambled_sequences.csv"
+         sequence_path="Documents/input_files/scrambled_sequences.csv"
 )
 ```
 

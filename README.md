@@ -76,9 +76,13 @@ MPRADesignGenerator makes use of three user-provided .csv files (two required, o
 
 ### Output File ###
 
-Oligo Format:
+The *generate()* function writes a file named "OLIGO_LIBRARY.csv"  to the current working directory. This file is the final oligonucleotide library. It contains all oligos generated for variants from the Variant Input file and sequences provided in the Sequence Input file.
+
+General Oligo Format:
 
 ![image](./file_input_format/Oligo_Format.PNG)
+
+![image](./file_input_format/Output_by_input_type.PNG)
 
 ## About MPRADesignGenerator ##
 

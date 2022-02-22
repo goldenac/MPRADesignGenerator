@@ -82,11 +82,27 @@ General Oligo Format:
 
 ![image](./file_input_format/Oligo_Format.PNG)
 
-![image](./file_input_format/Output_by_input_type.PNG)
+![image](./file_input_format/Oligo_breakdown.PNG)
 
 ## About MPRADesignGenerator ##
 
 - Purpose
+
+### How it Works ###
+1. Create oligos from sequences
+2. Get genomic sequences for variants
+  * from coordinate get 72 bases upstream and 72 bases downstream (72 + 1 + 72 = 145bp). This is the REF sequence.
+  * check sequences for restriction sites
+      - if restriction site(s) **is not** overlapping snp (base 73), change it to the "fix" specified by the user
+      - if restriction site(s) **is** overlapping snp (base 73), drop the variant from the library
+  * Create the ALT sequence as specified in Variant Input File
+      - **SNPs**: base 73 is swapped for base in ALT column
+      - **Insertions**: bases in ALT column are inserted after base 73. Two bases (one from front, one from end) are removed from the sequence until the length is 145 or 144bp. The same bases are then removed from the REF sequence.
+      - **Deletions**: the number of bases in the REF column are counted. The same number of bases are removed starting with base 73 and moving to the right to create the ALT sequence. The bases that will be deleted by the program are compared to the bases listed in the REF column; if they do not match, the program will still create the ALT sequence but will give a warning.
+  *
+3. bird
+4. other bird    
+
 - How it works
     * How are alt sequences created for each variant type
     * How are restriction enzyme sites handled

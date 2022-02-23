@@ -86,29 +86,23 @@ General Oligo Format:
 
 ## About MPRADesignGenerator ##
 
-- Purpose
+### Purpose ###
+
+This application is inspired by Dr. Andrew Ghazi's [*mpradesigntools*](https://github.com/andrewGhazi/mpradesigntools). Like *mpradesigntools*, it's purpose is to quickly and correctly generate a design file for an MPRA experiment. It is, however, unique in its user-directed approach to modifying restriction sites which appear in the genomic context of oligonucleotides. It is also unqiue in its inclusion of oligos generated from sequences provided directly by the user in addition to oligos whose sequences have been generated from coordinates provided by the user.
+
+> Andrew R Ghazi, Edward S Chen, David M Henke, Namrata Madan, Leonard C Edelstein, Chad A Shaw; Design tools for MPRA experiments, Bioinformatics, Volume 34, Issue 15, 1 August 2018, Pages 2682–2683, https://doi.org/10.1093/bioinformatics/bty150
 
 ### How it Works ###
 1. Create oligos from sequences
 2. Get genomic sequences for variants
-  * from coordinate get 72 bases upstream and 72 bases downstream (72 + 1 + 72 = 145bp). This is the REF sequence.
-  * check sequences for restriction sites
+  * From coordinate get 72 bases upstream and 72 bases downstream (72 + 1 + 72 = 145bp). This is the REF sequence.
+  * Check sequences for restriction sites
       - if restriction site(s) **is not** overlapping snp (base 73), change it to the "fix" specified by the user
       - if restriction site(s) **is** overlapping snp (base 73), drop the variant from the library
-  * Create the ALT sequence as specified in Variant Input File
+  * Create the ALT sequence as specified in Variant Input file
       - **SNPs**: base 73 is swapped for base in ALT column
       - **Insertions**: bases in ALT column are inserted after base 73. Two bases (one from front, one from end) are removed from the sequence until the length is 145 or 144bp. The same bases are then removed from the REF sequence.
       - **Deletions**: the number of bases in the REF column are counted. The same number of bases are removed starting with base 73 and moving to the right to create the ALT sequence. The bases that will be deleted by the program are compared to the bases listed in the REF column; if they do not match, the program will still create the ALT sequence but will give a warning.
-  *
-3. bird
-4. other bird    
-
-- How it works
-    * How are alt sequences created for each variant type
-    * How are restriction enzyme sites handled
-
-
-## Troubleshooting ##
-
-- Problems loading packages
-- File does not exist
+  * Create reverse complementary (REV) sequences for both REF and ALT sequences
+3. Create oligos for each sequence (REF_FWD, REF_REV, ALT_FWD, ALT_REV) created from Variant Input file
+4. Combine oligos from sequences and oligos from variant input into the final Oligo Library

@@ -88,7 +88,7 @@ General Oligo Format:
 
 ### Purpose ###
 
-This application is inspired by Dr. Andrew Ghazi's [*mpradesigntools*](https://github.com/andrewGhazi/mpradesigntools). Like *mpradesigntools*, it's purpose is to quickly and correctly generate a design file for an MPRA experiment. It is, however, unique in its user-directed approach to modifying restriction sites which appear in the genomic context of oligonucleotides. It is also unqiue in its inclusion of oligos generated from sequences provided directly by the user in addition to oligos whose sequences have been generated from coordinates provided by the user.
+This application is inspired by Dr. Andrew Ghazi's [*mpradesigntools*](https://github.com/andrewGhazi/mpradesigntools). Like *mpradesigntools*, it's purpose is to quickly and correctly generate a design file for an MPRA experiment. It is, however, unique in its user-directed approach to modifying restriction sites which appear in the genomic context of oligonucleotides. It is also unique in its inclusion of oligos generated from sequences provided directly by the user in addition to oligos whose sequences have been generated from coordinates provided by the user.
 
 > Andrew R Ghazi, Edward S Chen, David M Henke, Namrata Madan, Leonard C Edelstein, Chad A Shaw; Design tools for MPRA experiments, Bioinformatics, Volume 34, Issue 15, 1 August 2018, Pages 2682–2683, https://doi.org/10.1093/bioinformatics/bty150
 

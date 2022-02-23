@@ -20,7 +20,11 @@
 #' @param scrambled_path path to file containing scrambled sequences
 #' @return design file
 #' @export
-generate = function(fwdprimer, revprimer, tags_per_variant, enz1, enz2, enz3, enz1FIX, enz2FIX, enz3FIX, variant_input_path, tag_path, scrambled_path){
+generate = function(fwdprimer, revprimer, tags_per_sequence, enz1, enz1FIX, enz2, enz2FIX, enz3, enz3FIX, variant_input_path, tag_path, sequence_path){
+
+  tags_per_variant <-  tags_per_sequence # changed argument name for the sake of clarity
+  scrambled_path <- sequence_path # changed argument name for the sake of clarity
+
   # 1) LOAD FILTERED TAGS #############################################################################################
   tags <- readr::read_csv(tag_path, col_names=TRUE, col_types=cols("c"))
 

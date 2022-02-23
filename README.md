@@ -44,8 +44,8 @@ generate(fwdprimer="GCTAATAAGCTTCACGT",
 
 Argument | Explanation | Example
 ---- | ---- | ----
-fwdprimer | Forward primer entered as a string | "ACTG"
-revprimer | Reverse primer entered as a string | "GATC" 
+fwdprimer | Forward primer entered as a string | "GCTAATAAGCTTCACGT"
+revprimer | Reverse primer entered as a string | "GTTTAATCCGTACGCTCT" 
 tags_per_variant | Integer indicating the number of tags used for each variant class (fwd_ref, fwd_alt, rev_ref, rev_alt). The total number of oligonucleotides generated for each variant is equal to 4 x tags_per_variant | 25
 enz1 | Restriction enzyme entered as a string | "GGTACC"
 enz1FIX | Modified digestion site for enzyme1 (How the sequence should be changed if a digestion site is found in the DNA sequence) entered as a string. | "GGATCC"
@@ -69,7 +69,7 @@ MPRADesignGenerator makes use of three user-provided .csv files (two required, o
     
 ![image](./file_input_format/tags_format.PNG)
     
-- *File 3: Scrambled Sequences* - Provides an ID and 145bp "scrambled" sequence. Note that these sequences do not necessarily have to be scrambled; any 145bp sequence can be provided.
+- *File 3: Sequences* - Provides an ID and sequence. 
     
 ![image](./file_input_format/scrambled_sequences_format.PNG)
 

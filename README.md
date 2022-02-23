@@ -27,7 +27,7 @@ The .csv file containing the library of oligos is generated with the generate() 
 ```
 generate(fwdprimer="GCTAATAAGCTTCACGT",
          revprimer="GTTTAATCCGTACGCTCT",
-         tags_per_variant=25,
+         tags_per_sequence=25,
          enz1="GGTACC",
          enz1FIX="GGATCC",
          enz2="TCTAGA",
@@ -46,7 +46,7 @@ Argument | Explanation | Example
 ---- | ---- | ----
 fwdprimer | Forward primer entered as a string | "GCTAATAAGCTTCACGT"
 revprimer | Reverse primer entered as a string | "GTTTAATCCGTACGCTCT" 
-tags_per_variant | Integer indicating the number of tags used for each variant class (fwd_ref, fwd_alt, rev_ref, rev_alt). The total number of oligonucleotides generated for each variant is equal to 4 x tags_per_variant | 25
+tags_per_sequence | Integer indicating the number of tags used for each variant class (fwd_ref, fwd_alt, rev_ref, rev_alt). The total number of oligonucleotides generated for each variant is equal to 4 x tags_per_variant | 25
 enz1 | Restriction enzyme entered as a string | "GGTACC"
 enz1FIX | Modified digestion site for enzyme1 (How the sequence should be changed if a digestion site is found in the DNA sequence) entered as a string. | "GGATCC"
 enz2 | restriction enzyme entered as a string | "TCTAGA"
@@ -55,7 +55,7 @@ enz3 | Restriction enzyme entered as a string. **NOTE:** Use a period as shown i
 enz3FIX | Modified digestion site for enzyme3 (How the sequence should be changed if a digestion site is found in the DNA sequence) entered as a string. | "GCGC.....GGCC"
 variant_input_path | Path to file containing variant coordinates and ref/alt alleles entered as a string. | "Documents/input_files/variant_input.csv"
 tag_path | Path to file containing tag sequences entered as a string. | "Documents/input_files/tags.csv"
-scrambled_path | Path to file containing scrambled sequences entered as a string. This argument is optional. | "Documents/input_files/scrambled_sequences.csv"
+sequence_path | Path to file containing scrambled sequences entered as a string. This argument is optional. | "Documents/input_files/scrambled_sequences.csv"
 
 ### Input File Format ###
 
